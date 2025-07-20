@@ -1,6 +1,8 @@
 const usersRouter = require('express').Router();
-const { createUser, getAllUsers, getUserById } = require('../db/users');
+const { createUser, getAllUsers, getUserById,getUserByUsername } = require('../db/adapters/users');
 const catchAsync = require('../utils/catchAsync');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = process.env;
 const bcrypt = require('bcrypt');
 
 usersRouter.use(catchAsync(async (req,res,next) => {
@@ -8,6 +10,46 @@ usersRouter.use(catchAsync(async (req,res,next) => {
     next();
 }));
 
+//Register a new user
+usersRouter.post('/register', catchAsync(async (req, res, next) => {
+    console.log('Registering a new user');
+    const { username, password } = req.body;
+    if (!username || !password) {
+        res.status(400).send({
+            error: 'Username and password are required',
+            name: 'MissingCredentialsError',
+            message: 'Please provide both username and password'
+
+        });
+    } else if (password.length < 5) {
+        res.status(400).send({
+            error: 'Password too short',
+            name: 'PasswordLengthError',
+            message: 'Password must be at least 8 characters long'
+        });
+    } else {
+        const user = await getUserByUsername(username);
+        if (user) {
+            res.status(400).send({
+                error: 'User already exists',
+                name: 'UserExistsError',
+                message: 'Please choose a different username'
+            });
+        } else {
+            const newUser = await createUser({ username, password });
+            const token = jwt.sign({ id: newUser.id }, JWT_SECRET, { expiresIn: '1w' });
+            res.send({
+                user: newUser,
+                message: 'User created successfully',
+                token,
+                success: true
+            });
+        }
+    }
+}));
+
+
+module.exports = usersRouter;   
 
 
 module.exports = usersRouter;
