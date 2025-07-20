@@ -1,17 +1,15 @@
 const express = require('express');
 const fishRouter = express.Router();
 const { createFish, getAllFish } = require('../db/fish');
+const catchAsync = require('../utils/catchAsync');
 
 
-fishRouter.get('/', async (req, res, next) => {
-    try {
-        const fish = await getAllFish();
-        res.send(fish);
-    } catch (error) {
-        next(error);
-    }
-}
-);
+fishRouter.get('/', catchAsync(async (req, res, next) => {
+    const fish = await getAllFish();
+    res.send(fish);
+}));
+
+
 
 
 module.exports = fishRouter; 
