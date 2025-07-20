@@ -48,8 +48,56 @@ usersRouter.post('/register', catchAsync(async (req, res, next) => {
     }
 }));
 
+//Login an existing user
+usersRouter.post('/login', catchAsync(async (req, res, next) => {
+    console.log('Logging in user');
+    const { username, password } = req.body;
 
-module.exports = usersRouter;   
+    if (!username || !password) {
+        return res.status(400).send({
+            error: 'Username and password are required',
+            name: 'MissingCredentialsError',
+            message: 'Please provide both username and password',
+            success: false
+        });
+    }
+
+    const user = await getUserByUsername(username);
+    if (!user) {
+        return res.status(401).send({
+            error: 'Invalid credentials',
+            name: 'InvalidCredentialsError',
+            message: 'Username or password is incorrect',
+            success: false
+        });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+        return res.status(401).send({
+            error: 'Invalid credentials',
+            name: 'InvalidCredentialsError',
+            message: 'Username or password is incorrect',
+            success: false
+        });
+    }
+
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '2hr' });
+
+    // Remove sensitive data before sending
+    const { password: _, ...safeUser } = user;
+
+    res.send({
+        user: safeUser,
+        message: 'Login successful',
+        token,
+        success: true
+    });
+}));
+
+
 
 
 module.exports = usersRouter;
+
+
