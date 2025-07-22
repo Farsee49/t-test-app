@@ -4,14 +4,14 @@ const client = require('../client');
 
 
 
-const createFish = async ({ name, type }) => {
+const createFish = async ({ species, scientificName, location, userId }) => {
     try {
         const query = `
-            INSERT INTO fish(name, type)
-            VALUES($1, $2)
+            INSERT INTO fish(species, scientificName, location, userId)
+            VALUES($1, $2, $3, $4)
             RETURNING *;
         `;
-        const { rows: [fish] } = await client.query(query, [name, type]);
+        const { rows: [fish] } = await client.query(query, [species, scientificName, location, userId]);
         return fish;
     } catch (error) {
         console.error('Error creating fish', error);

@@ -1,6 +1,6 @@
 const client = require('./client');
-const {createFish} = require('./fish');
-const {createUser} = require('./users');
+const {createFish} = require('./adapters/fish');
+const {createUser} = require('./adapters/users');
 const {fishData, userData} = require('./seedData');
 
 
@@ -71,7 +71,7 @@ async function createInitialFish() {
 async function createDb () {
     console.log('Creating database');
     try {
-       client.connect();
+      client.connect();
        await dropTables();
        await createTables();
        await createInitialUsers();
