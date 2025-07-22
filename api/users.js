@@ -1,5 +1,12 @@
 const usersRouter = require('express').Router();
-const { createUser, getAllUsers, getUserById,getUserByUsername } = require('../db/adapters/users');
+const { createUser,
+        getAllUsers, 
+        getUserById,
+        getUserByUsername, 
+        getUserByUsernameForAuth,
+        getUserByIdForAuth,
+        deleteUser
+    } = require('../db/adapters/users');
 const catchAsync = require('../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env;
@@ -62,7 +69,7 @@ usersRouter.post('/login', catchAsync(async (req, res, next) => {
         });
     }
 
-    const user = await getUserByUsername(username);
+    const user = await getUserByUsernameForAuth(username);
     if (!user) {
         return res.status(401).send({
             error: 'Invalid credentials',
@@ -91,6 +98,36 @@ usersRouter.post('/login', catchAsync(async (req, res, next) => {
         user: safeUser,
         message: 'Login successful',
         token,
+        success: true,
+        isLoggedIn: true
+    });
+}));
+
+//Delete a user
+usersRouter.delete('/:userId', catchAsync(async (req, res, next) => {
+    console.log('Deleting user with ID:', req.params.userId);
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).send({
+            error: 'User ID is required',
+            name: 'MissingUserIdError',
+            message: 'Please provide a user ID to delete'
+        });
+    }
+
+    const deletedUser = await deleteUser(userId);
+    if (!deletedUser) {
+        return res.status(404).send({
+            error: 'User not found',
+            name: 'UserNotFoundError',
+            message: `No user found with ID ${userId}`
+        });
+    }
+
+    res.send({
+        message: 'User deleted successfully',
+        user: deletedUser,
         success: true
     });
 }));

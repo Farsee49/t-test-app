@@ -5,7 +5,7 @@ const SALT_COUNT = 10;
 
 
 
-createUser = async ({ username, password }) => {
+const createUser = async ({ username, password }) => {
     try {
         const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
         const query = `
@@ -14,14 +14,23 @@ createUser = async ({ username, password }) => {
             RETURNING *;
         `;
         const { rows: [user] } = await client.query(query, [username, hashedPassword]);
-        return user;
+        
+        // Remove sensitive data before returning
+        const { password: _, ...safeUser } = user;
+        return safeUser;
     } catch (error) {
         console.error('Error creating user', error);
+        
+        // Handle duplicate username constraint violation
+        if (error.code === '23505' && error.constraint === 'users_username_key') {
+            throw new Error('Username already exists');
+        }
+        
         throw new Error('Failed to create user');
     }
 };
 
-getAllUsers = async () => {
+const getAllUsers = async () => {
     try {
         const query = `
             SELECT * FROM users;
@@ -34,33 +43,96 @@ getAllUsers = async () => {
     }
 };
 
-getUserByUsername = async (username) => {
+const getUserByUsername = async (username) => {
     try{
         const query = `
             SELECT * FROM users
             WHERE username=$1;
         `;
         const {rows: [user]} = await client.query(query, [username]);
-        return user;
+        
+        // Handle case when no user is found
+        if (!user) {
+            return null;
+        }
+        
+        // Remove sensitive data before returning
+        const { password: _, ...safeUser } = user;
+        return safeUser;
     } catch (error) {
         console.error('Error fetching user by username:', error);
         throw error;
     }
 }
 
-getUserById = async (id) => {
+const getUserByUsernameForAuth = async (username) => {
+    try{
+        const query = `
+            SELECT * FROM users
+            WHERE username=$1;
+        `;
+        const {rows: [user]} = await client.query(query, [username]);
+        return user; // Return full user object including password for authentication
+    } catch (error) {
+        console.error('Error fetching user by username for auth:', error);
+        throw error;
+    }
+}
+
+const getUserById = async (id) => {
     try {
         const query = `
-        SELECT * FROM users
-        WHERE id=$1;
+            SELECT * FROM users
+            WHERE id=$1;
         `;
         const { rows: [user] } = await client.query(query, [id]);
-        return user;
+        
+        // Handle case when no user is found
+        if (!user) {
+            return null;
+        }
+        
+        // Remove sensitive data before returning
+        const { password: _, ...safeUser } = user;
+        return safeUser;
     } catch (error) {
         console.error('Error fetching user by ID:', error);
         throw error;
     }
 }
+
+const getUserByIdForAuth = async (id) => {
+    try {
+        const query = `
+            SELECT * FROM users
+            WHERE id=$1;
+        `;
+        const { rows: [user] } = await client.query(query, [id]);
+        return user; // Return full user object including password for authentication
+    } catch (error) {
+        console.error('Error fetching user by ID for auth:', error);
+        throw error;
+    }
+}
+
+
+const deleteUser = async (id) => {
+    try {
+        const query = `
+            DELETE FROM users
+            WHERE id=$1
+            RETURNING *;
+        `;
+        const { rows: [user] } = await client.query(query, [id]);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        return user; // Return the deleted user object
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        throw new Error('Failed to delete user');
+    }
+};
 
 
 
@@ -68,5 +140,8 @@ module.exports = {
     createUser,
     getAllUsers,
     getUserById,
-    getUserByUsername
+    getUserByUsername,
+    getUserByUsernameForAuth,
+    getUserByIdForAuth,
+    deleteUser
 }

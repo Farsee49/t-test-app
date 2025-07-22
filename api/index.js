@@ -1,8 +1,15 @@
 
 
 const apiRouter = require('express').Router();
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = process.env;
 const fishRouter = require('./fish');
 const userRouter = require('./users');
+const { getUserById } = require('../db/adapters/users');
+
+
+
+
 
  apiRouter.use(async (req, res, next) => {
   const prefix = 'Bearer ';
@@ -15,9 +22,12 @@ const userRouter = require('./users');
 
     try {
       const { id } = jwt.verify(token, JWT_SECRET);
+      console.log('Token verified, user ID:', id);
 
       if (id) {
         req.user = await getUserById(id);
+       confirmUser = req.user;
+        console.log('User confirmed:', confirmUser);
         next();
       }
     } catch ({ name, message }) {
