@@ -10,7 +10,7 @@ const morgan = require('morgan');
 
 
 
-server.use(express.static('public'));
+// server.use(express.static('public'));
 server.use(morgan('dev'));
 server.use(cors());
 server.use(bodyParser.json());
