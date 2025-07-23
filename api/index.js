@@ -6,10 +6,9 @@ const { JWT_SECRET } = process.env;
 const fishRouter = require('./fish');
 const userRouter = require('./users');
 const { getUserById } = require('../db/adapters/users');
+const cookieParser = require('cookie-parser');
 
-
-
-
+apiRouter.use(cookieParser());
 
  apiRouter.use(async (req, res, next) => {
   const prefix = 'Bearer ';
@@ -40,6 +39,7 @@ const { getUserById } = require('../db/adapters/users');
     });
   }
 });
+
 
 
 apiRouter.use('/fish', fishRouter);

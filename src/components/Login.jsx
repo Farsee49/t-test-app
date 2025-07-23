@@ -35,6 +35,7 @@ export default function Login({
             setToken(response.token);
             setIsLoggedIn(true);
             window.localStorage.setItem('token', response.token);
+            
           
             navigate('/fish')
         }

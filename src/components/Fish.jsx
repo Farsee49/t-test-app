@@ -11,7 +11,7 @@ export default function Fish() {
         const response = await getFish();
         if (response && response.data) {
             console.log(response.data);
-            setFish(response.data);
+            setFish(prevFish => [...prevFish, ...response.data]);
         }
     }
 

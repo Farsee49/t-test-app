@@ -1,4 +1,6 @@
 const usersRouter = require('express').Router();
+const cookieParser = require('cookie-parser');
+usersRouter.use(cookieParser());
 const { createUser,
         getAllUsers, 
         getUserById,
@@ -93,14 +95,23 @@ usersRouter.post('/login', catchAsync(async (req, res, next) => {
 
     // Remove sensitive data before sending
     const { password: _, ...safeUser } = user;
-
+     res.cookie('token', token, {
+        httpOnly: false});
+  console.log('Cookie set at login:', res.cookie);
     res.send({
         user: safeUser,
         message: 'Login successful',
         token,
         success: true,
         isLoggedIn: true
-    });
+    })
+    // res.send({
+    //     user: safeUser,
+    //     message: 'Login successful',
+    //     token,
+    //     success: true,
+    //     isLoggedIn: true
+    // });
 }));
 
 //Delete a user

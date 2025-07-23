@@ -7,19 +7,21 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const chalk = require('chalk');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 
-
+const corsOptions = {
+  origin: 'http://localhost:3000', // Replace with your frontend's origin
+  credentials: true, // Enable cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+};
 
 // server.use(express.static('public'));
+
 server.use(morgan('dev'));
-server.use(cors());
+server.use(cors(corsOptions));
 server.use(bodyParser.json());
-server.get('/home', (req, res) => {
-    res.send('Hello World');
-}
-);
-
-
+server.use(cookieParser());
 
 const apiRouter = require('./api');
 server.use('/api', apiRouter);

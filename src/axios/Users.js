@@ -28,7 +28,9 @@ export async function loginUser(user) {
     const loginUrl = 'http://localhost:4444/api/users/login';
 
     try {
-        const response = await axios.post(loginUrl, user);
+        const response = await axios.post(loginUrl, user, {
+      withCredentials: true, // Important for sending cookies
+    });
         return response.data;
     } catch (error) {
         console.error('Login failed:', error.message);
