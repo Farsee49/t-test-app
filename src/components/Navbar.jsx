@@ -11,8 +11,8 @@ export default function Navbar({ logout, isLoggedIn, loggedInUser }) {
 
 
   return (
-    <Box  sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar sx={{backgroundColor: '#007200'}} position="static">
         <Toolbar>
           <IconButton
             size="large"
