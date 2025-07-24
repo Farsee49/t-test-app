@@ -14,6 +14,38 @@ export default function Fish() {
             setFish(prevFish => [...prevFish, ...response.data]);
         }
     }
+    console.log
+    function FishItem({ species, scientificname , location }) {
+    return (
+        <li>
+            <article>
+                <h3>Species: {species}</h3>
+                <p><b>Scientific Name:</b> {scientificname}</p>
+                <p><b>Location:</b> {location}</p>
+            </article>
+        </li>
+    );
+}
+    function FishList({ fish = [] }) {
+    if (fish.length === 0) {
+        return <p>No fish to display.</p>;
+    }
+
+    return (
+        <section>
+            <h2>Fish List</h2>
+            <ul>
+                {fish.map(({ id, species, scientificname, location }) => (
+                    <FishItem key={id} species={species} 
+                    scientificname={scientificname} location={location} />
+                ))}
+            </ul>
+        </section>
+    );
+}
+
+
+    
 
     useEffect(() => {
         Promise.all([fetchFish()])
@@ -26,17 +58,8 @@ export default function Fish() {
     }, []);
 
     return (
-        <>
-            <h2>Fish List</h2>
-            <ul>
-                {fish.map(fishItem => (
-                    <li key={fishItem.id}>
-                        <h3>{fishItem.species}</h3>
-                        <p>{fishItem.description}</p>
-                    </li>
-                ))}
-            </ul>
-        </>
+        <FishList fish={fish} />
+
     );
 }
 
