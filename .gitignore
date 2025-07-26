@@ -23,4 +23,5 @@ dist-ssr
 *.sw?
 
 /public/images
+/public/stuff
 !public/index.html
