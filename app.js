@@ -5,6 +5,7 @@ const server = express();
 const EXPPORT = process.env.EXPPORT;
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 const chalk = require('chalk');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
@@ -17,7 +18,7 @@ const corsOptions = {
 };
 
 // server.use(express.static('public'));
-
+server.use(express.static(path.join(__dirname, 'public')));
 server.use(morgan('dev'));
 server.use(cors(corsOptions));
 server.use(bodyParser.json());

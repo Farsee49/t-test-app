@@ -11,10 +11,7 @@ import Typography from '@mui/material/Typography';
 
 
 export default function Fish() {
-  
-
     const [fish, setFish] = useState([]);
-
     const fetchFish = async () => {
         const response = await getFish();
         if (response && response.data) {
@@ -22,6 +19,7 @@ export default function Fish() {
             setFish(prevFish => [...prevFish, ...response.data]);
         }
     }
+    
 
     useEffect(() => {
         Promise.all([fetchFish()])
@@ -33,58 +31,33 @@ export default function Fish() {
             });
     }, []);
 
-//     return (
-//         <>
-//             <h2>Fish List</h2>
-//             <ul>
-//                 {fish.map(fishItem => (
-//                     <li key={fishItem.id}>
-//                         <h3>{fishItem.species}</h3>
-//                         <p>{fishItem.description}</p>
-//                     </li>
-//                 ))}
-//             </ul>
-//         </>
-//     );
-// }
-
-// Note: Ensure that the `getFish` function is imported from the appropriate file where it is defined, similar to how `getQuote` is imported in the Quote component.
-
-
-
-
-
 
   return (
     <>
         <Typography variant="h2" sx={{ textAlign: 'center', margin: 2, color: '#007200' }}>
             Fish List
         </Typography>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-      {fish.map(fishItem => 
-        <Fragment key={fishItem.id}>
-        <Card sx={{ backgroundColor: '#623697', width: 600, margin: 2, padding: 2 }}>
-      <CardContent>
-        <Typography variant="h5" component="div">
-            {fishItem.species}
-        </Typography>
-        <br />
-       <span> <Typography ><i>Scientific Name:</i>  {fishItem.scientificname}</Typography> </span>
-       <br />
-       <Typography ><i>Location:</i> {fishItem.location}</Typography>
-        <Typography variant="body2">
-          
-          <br />
-       
-        </Typography>
-      </CardContent>
-      <CardActions>
-      
-      </CardActions>
+    <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+            {fish.map(fishItem => {
+            return (
+    <Card key={fishItem.id} sx={{ backgroundColor: '#623697', width: 600, margin: 2, padding: 2 }}>
+        <CardContent>
+            <Typography variant="h5" component="div">
+                {fishItem.species}
+            </Typography>
+                <br />
+            <span><Typography >Scientific Name: <></> <i>{fishItem.scientificname}</i></Typography> </span>
+                <br />
+            <span><Typography >Location: <></> <i>{fishItem.location}</i></Typography></span>
+                
+        </CardContent>
+        <CardActions>
+        </CardActions>
     </Card>
-  </Fragment>
-)}
-        </Box>
+   
+            );
+        })}
+    </Box>
     </>
   );
 }

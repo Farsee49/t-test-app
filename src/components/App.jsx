@@ -2,7 +2,7 @@
 import{ useState, useEffect } from 'react';
 import { useNavigate} from 'react-router-dom';
 import { Routes, Route } from "react-router-dom";
-import { Fish, Quote, Register, Login, Navbar } from './index';
+import { Fish, Quote, Register, Login, Navbar, Sushi } from './index';
   
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -59,6 +59,7 @@ if (authToken) {
       loggedInUser={loggedInUser}
       />
       <Quote />
+      <br />
       {/* {isLoggedIn && <h2>Welcome, {loggedInUser ? loggedInUser.username : 'Guest'}!</h2>} */}
       <Routes>
         <Route path='/login' 
@@ -74,7 +75,8 @@ if (authToken) {
           isLoggedIn={isLoggedIn}
           setIsLoggedIn={setIsLoggedIn}
         />} />
-
+        <Route path="/sushi" 
+          element={<Sushi />} />  
         <Route path="/fish" 
           element={<Fish />} />
 
