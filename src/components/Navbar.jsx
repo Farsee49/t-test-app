@@ -35,7 +35,10 @@ export default function Navbar({ logout, isLoggedIn, loggedInUser }) {
             {!isLoggedIn ? <Button color="inherit">Register</Button> : null}
           </Link>
           <Link to="/fish" style={{ textDecoration: 'none' }}>  {/* Link for SPA navigation */}
-            {/* <Button color="inherit">Fish</Button> */}
+            {isLoggedIn && <Button color="inherit">Fish</Button>}
+          </Link>
+          <Link to="/sushi" style={{ textDecoration: 'none' }}>  {/* Link for SPA navigation */}
+            {isLoggedIn && <Button color="inherit">Sushi</Button>}
           </Link>
         </Toolbar>
       </AppBar>

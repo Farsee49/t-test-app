@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env;
 const fishRouter = require('./fish');
 const userRouter = require('./users');
+const imageRouter = require('./images');
 const { getUserById } = require('../db/adapters/users');
 const cookieParser = require('cookie-parser');
 
@@ -44,5 +45,6 @@ apiRouter.use(cookieParser());
 
 apiRouter.use('/fish', fishRouter);
 apiRouter.use('/users', userRouter);
+apiRouter.use('/images', imageRouter);
 
 module.exports = apiRouter;
