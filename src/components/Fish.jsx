@@ -38,9 +38,9 @@ export default function Fish() {
             Fish List
         </Typography>
     <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {fish.map(fishItem => (
-    <Fragment key={fishItem.id}>
-    <Card sx={{ backgroundColor: '#623697', width: 600, margin: 2, padding: 2 }}>
+            {fish.map(fishItem => {
+            return (
+    <Card key={fishItem.id} sx={{ backgroundColor: '#623697', width: 600, margin: 2, padding: 2 }}>
         <CardContent>
             <Typography variant="h5" component="div">
                 {fishItem.species}
@@ -52,11 +52,11 @@ export default function Fish() {
                 
         </CardContent>
         <CardActions>
-      
         </CardActions>
     </Card>
-    </Fragment>
-))}
+   
+            );
+        })}
     </Box>
     </>
   );

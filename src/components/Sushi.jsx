@@ -39,12 +39,12 @@ export default function Sushi() {
         </Typography> 
 
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+
             {images.map((image, index) => (
-                console.log('Rendering image:', image.url),
                 <Card key={index} sx={{ margin: 2 }}>
                     <CardContent>
                         <Typography variant="h5">{image.title}</Typography>
-                        <img src={image.url} alt={image.title} style={{ width: '600px', height: '500px' }} />
+                        <img src={image.url} alt={image.title} style={{ width: '300px', height: '200px' }} />
                     </CardContent>
                     <CardActions>
                         <Button onClick={() => window.open(image.url, '_blank')} size="small">View</Button>
