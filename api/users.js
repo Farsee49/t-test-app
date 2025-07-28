@@ -58,61 +58,65 @@ usersRouter.post('/register', catchAsync(async (req, res, next) => {
 }));
 
 //Login an existing user
-usersRouter.post('/login', catchAsync(async (req, res, next) => {
-    console.log('Logging in user');
+usersRouter.post('/login', catchAsync(async (req, res) => {
     const { username, password } = req.body;
+    console.log('Logging in user:', req.body); // Remove this in production
 
     if (!username || !password) {
         return res.status(400).send({
             error: 'Username and password are required',
-            name: 'MissingCredentialsError',
-            message: 'Please provide both username and password',
+            name: 'UserLoginError',
+            message: 'Username and password are required',
             success: false
         });
     }
 
-    const user = await getUserByUsernameForAuth(username);
-    if (!user) {
-        return res.status(401).send({
-            error: 'Invalid credentials',
-            name: 'InvalidCredentialsError',
-            message: 'Username or password is incorrect',
-            success: false
+        // Find the user by username
+        const user = await getUserByUsernameForAuth(username);
+        if (!user) {
+            return res.status(400).send({
+                error: 'Invalid credentials',
+                name: 'AuthenticationError',
+                message: 'Username or password is incorrect',
+                success: false
+            });
+        }
+        
+        req.user = user;  // Ensure req.user is set if using tokenAuth middleware
+        //console.log('User found:', user, 'RU', req.user); // Debugging line, remove in production
+        // Check if password matches
+        // Store user in session
+       // Debugging line, remove in production
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).send({
+                error: 'Invalid credentials',
+                name: 'AuthenticationError',
+                message: 'Username or password is incorrect',
+                success: false
+            });
+        }
+
+        if (req.user ) {
+        // Create JWT token with expiration (1 hour)
+        const token = jwt.sign({ id: user.id, username: user.username, req: { user } }, JWT_SECRET, { expiresIn: '1h' });
+        //console.log(token,'TOKEN'); // Debugging line, remove in production
+            // Sterilize sensitive data before sending
+        const { password: _, ...safeUser } = user;
+         // Remove password from user object
+        console.log('Safe user:', safeUser);
+        req.user = safeUser;
+        req.session.user = user // Debugging line, remove in production
+        res.status(200).send({
+            message: 'User logged in successfully',
+            user: safeUser,
+            token,
+            success: true
         });
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-        return res.status(401).send({
-            error: 'Invalid credentials',
-            name: 'InvalidCredentialsError',
-            message: 'Username or password is incorrect',
-            success: false
-        });
-    }
-
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '2hr' });
-
-    // Remove sensitive data before sending
-    const { password: _, ...safeUser } = user;
-     res.cookie('token', token, {
-        httpOnly: false});
-  console.log('Cookie set at login:', res.cookie);
-    res.send({
-        user: safeUser,
-        message: 'Login successful',
-        token,
-        success: true,
-        isLoggedIn: true
-    })
-    // res.send({
-    //     user: safeUser,
-    //     message: 'Login successful',
-    //     token,
-    //     success: true,
-    //     isLoggedIn: true
-    // });
 }));
+
 
 //Delete a user
 usersRouter.delete('/:userId', catchAsync(async (req, res, next) => {
@@ -143,8 +147,31 @@ usersRouter.delete('/:userId', catchAsync(async (req, res, next) => {
     });
 }));
 
-
-
+// Logout a user
+usersRouter.post('/logout', catchAsync(async (req, res) => {
+    // Invalidate the user's token or session
+    console.log('Logging out user:', req.user);
+    if (!req.user) {
+        return res.status(400).send({
+            error: 'No user is currently logged in',
+            name: 'UserNotLoggedInError',
+            message: 'Please log in before attempting to log out'
+        });
+    }
+    req.session.destroy(err => {
+    if (err) {
+      return res.status(500).send('Could not log out.');
+    }
+    res.clearCookie('connect.sid'); // Optional
+    res.send('Logged out.');
+    req.user = null;
+    req.session.user = null;
+    res.send({
+        message: 'User logged out successfully',
+        success: true
+    });
+});
+}));
 
 module.exports = usersRouter;
 

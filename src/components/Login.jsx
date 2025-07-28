@@ -28,16 +28,19 @@ export default function Login({
         // Attempt to log in the user
         const response = await loginUser(user);
         console.log('Login response:', response);
-        console.log('Login successful:', response.user);
-         console.log('Token:', response.token);
+        if (!response || !response.success) {
+            throw new Error(response.message || 'Login failed');
+        }
         setLoggedInUser(response.user);
         if(response.success === true) {
-            setToken(response.token);
-            setIsLoggedIn(true);
-            window.localStorage.setItem('token', response.token);
+            try{
+                setToken(response.token);
+                setIsLoggedIn(true);
+                setLoggedInUser(response.user);
+            }catch(error){
+                console.error('Error setting token:', error);
+            }
             
-          
-            navigate('/fish')
         }
         // On success, navigate to the desired route
         navigate('/fish');
