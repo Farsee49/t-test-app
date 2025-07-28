@@ -2,7 +2,9 @@
 import{ useState, useEffect } from 'react';
 import { useNavigate} from 'react-router-dom';
 import { Routes, Route } from "react-router-dom";
-import { Fish, Quote, Register, Login, Navbar, Sushi } from './index';
+import { Fish, Quote, Register, Login, Navbar, Sushi, AddFish } from './index';
+import { getFish } from '../axios/Fish';
+import { getImages } from '../axios/Images';
   
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -15,53 +17,48 @@ export default function App() {
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [token, setToken] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [fish, setFish] = useState([]);
+    const [images, setImages] = useState([]);
 
-console.log('Token in App:', token);
-console.log('Cookies in App:', document.cookie);
-    async function logout() {
-         setToken("")
-         setIsLoggedIn(false)
-        window.localStorage.removeItem("token")
-        useNavigate(window.location.href="/login")
+    
+
+    const fetchImages = async () => {
+      try {
+        const response = await getImages();
+        if (response && response.data) {
+            console.log('Fetched images at App component:', response.data);
+            setImages(prevImages => [...prevImages, ...response.data]);
+        }
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      }
     }
 
-    function getCookie(name) {
-  const cookies = document.cookie.split('; ');
-  console.log('Cookies:', cookies);
-  // Find the cookie with the specified name
-  for (let i = 0; i < cookies.length; i++) {
-    const cookie = cookies[i];
-    if (cookie.startsWith(`${name}=`)) {
-      return cookie.substring(name.length + 1);
-    }
-  }
-  return null;
-}
-    // Check if the user is logged in by checking the token in localStorage
-    useEffect(() => {
-        const cookieToken = getCookie('token');
-        console.log('Cookie token:', cookieToken);
-    }, []);
+    
 
-// Access the authentication token
-const authToken = getCookie('authToken');
+   useEffect(() => {
+  //getFish(setFish, token);
+  fetchImages();
+   //fetchFish(setFish, token);
+}, []);
 
-if (authToken) {
-  console.log('User is authenticated with token:', authToken);
-}
-
+console.log('App component mounted',token, isLoggedIn);
   return (
     <div>
       <h1>Test-App</h1>
       <Navbar 
-      logout={logout}
       isLoggedIn={isLoggedIn}
       loggedInUser={loggedInUser}
+      setIsLoggedIn={setIsLoggedIn}
+      setLoggedInUser={setLoggedInUser}
+      setToken={setToken}
+      token={token}
       />
       <Quote />
       <br />
       {/* {isLoggedIn && <h2>Welcome, {loggedInUser ? loggedInUser.username : 'Guest'}!</h2>} */}
       <Routes>
+      
         <Route path='/login' 
           element={<Login 
           username={username}
@@ -75,10 +72,24 @@ if (authToken) {
           isLoggedIn={isLoggedIn}
           setIsLoggedIn={setIsLoggedIn}
         />} />
+       
         <Route path="/sushi" 
-          element={<Sushi />} />  
+          element={<Sushi 
+            images={images}
+            setImages={setImages}
+          />} />  
         <Route path="/fish" 
-          element={<Fish />} />
+          element={<Fish 
+            fish={fish}
+            setFish={setFish}
+           
+          />} />
+        <Route path="/addfish" 
+          element={<AddFish 
+            addFish={setFish}
+            token={token}
+            user={loggedInUser}
+          />} />
 
         <Route path="/register" 
           element={<Register />} />

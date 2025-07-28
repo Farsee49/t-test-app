@@ -2,6 +2,7 @@ import axios from 'axios';
 
 
 
+
 //____________________________________REGISTER USER____________________________________
 // This function registers a new user by sending a POST request to the server
 // It expects a user object containing the necessary registration details
@@ -113,3 +114,26 @@ export async function getAllUsers() {
 }
 
 
+//____________________________________LOGOUT USER____________________________________
+// This function logs out the current user by sending a POST request to the server
+// It clears the session and user data
+// Returns the response data from the server or throws an error if the request fails
+
+export async function logoutUser(token) {
+    const logoutUrl = 'http://localhost:4444/api/users/logout';
+
+    try {
+        const response = await axios.post(logoutUrl, {}, {
+            withCredentials: true, // Important for sending cookies
+            headers: {
+                'Authorization': `Bearer ${token}` // Include token if needed
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Logout failed:', error.message);
+        throw new Error(`Logout failed: ${error.message}`);
+    }
+}
+
+    

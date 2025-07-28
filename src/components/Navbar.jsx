@@ -2,8 +2,10 @@
 import { AppBar, Box, Toolbar, Typography, Button, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useNavigate, Link} from 'react-router-dom';
+import {Logout} from './index'; // Importing Logout component
 
-export default function Navbar({ logout, isLoggedIn, loggedInUser }) {
+export default function Navbar(props) {
+  const { isLoggedIn, loggedInUser, setIsLoggedIn, setLoggedInUser, setToken, token } = props;
 
   const handleMenuClick = () => {
   console.log("Menu clicked! You can add a drawer here.");
@@ -27,7 +29,7 @@ export default function Navbar({ logout, isLoggedIn, loggedInUser }) {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Test App {isLoggedIn && <h2 style= {{textAlign: 'center'}}>Welcome, {loggedInUser ? loggedInUser.username : 'Guest'}!</h2>}
           </Typography>
-            {isLoggedIn ? <Button color="inherit" onClick={logout}>Logout</Button> : null}
+          {isLoggedIn?<Logout isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} setLoggedInUser={setLoggedInUser} setToken={setToken} token={token} />:null}
           <Link to="/login" style={{ textDecoration: 'none' }}>  {/* Link for SPA navigation */}
             {!isLoggedIn ? <Button color="inherit">Login</Button> : null}
           </Link>

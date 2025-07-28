@@ -6,4 +6,6 @@ export { default as Register } from './Register';
 export { default as Navbar } from './Navbar';
 export { default as Login } from './Login';
 export { default as Sushi } from './Sushi';
+export { default as Logout } from './Logout';
+export { default as AddFish } from './AddFish';
 //_______________________________________________________________________________________________________
